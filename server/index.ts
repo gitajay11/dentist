@@ -55,19 +55,17 @@ api.use((_req, res) => {
 
 app.use('/api', api)
 
-/* ---------- static site (production) ---------- */
+/* ---------- static site: served whenever a build exists ---------- */
 const dist = path.resolve(process.cwd(), 'dist')
-if (env.isProduction) {
-  if (!existsSync(dist)) {
-    console.warn('[static] dist/ not found — run `npm run build` first. Serving API only.')
-  } else {
-    app.use(express.static(dist, { maxAge: '1y', index: false, immutable: true }))
-    app.get('/{*splat}', (req, res, next) => {
-      if (req.method !== 'GET' || req.path.startsWith('/api/')) return next()
-      res.setHeader('Cache-Control', 'no-cache')
-      res.sendFile(path.join(dist, 'index.html'))
-    })
-  }
+if (existsSync(dist)) {
+  app.use(express.static(dist, { maxAge: '1y', index: false, immutable: true }))
+  app.get('/{*splat}', (req, res, next) => {
+    if (req.method !== 'GET' || req.path.startsWith('/api/')) return next()
+    res.setHeader('Cache-Control', 'no-cache')
+    res.sendFile(path.join(dist, 'index.html'))
+  })
+} else {
+  console.warn('[static] dist/ not found — run `npm run build` to serve the site from this server too. Serving API only.')
 }
 
 /* ---------- error handling ---------- */
@@ -82,7 +80,7 @@ app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
 
 /* ---------- start ---------- */
 const server = app.listen(env.port, async () => {
-  console.log(`[server] listening on http://localhost:${env.port} (${env.isProduction ? 'production' : 'development'})`)
+  console.log(`[server] listening on http://localhost:${env.port} (${env.isProduction ? 'production' : 'development'})${existsSync(dist) ? ' — serving site + API' : ' — API only'}`)
   try {
     await verifyTransport()
   } catch (err) {

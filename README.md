@@ -8,15 +8,16 @@ Design: bold black/white editorial system — full-viewport “masked card” mo
 npm install
 cp .env.example .env   # then fill in SMTP + mail settings (optional in development)
 
-npm run dev            # Vite frontend on :5173 (proxies /api → :8787)
-npm run dev:api        # appointment API on :8787, auto-restarts on change
+npm run dev:all        # frontend (:5173) + appointment API (:8787) together — use this
+npm run dev            # frontend only (proxies /api → :8787; needs dev:api running)
+npm run dev:api        # API only, auto-restarts on change
 npm run build          # type-check (app + server) + production build → dist/
-npm start              # production: serves dist/ + /api from one process
+npm start              # serves dist/ + /api from one process (after a build)
 npm run lint           # oxlint
 npm run mail:test      # send a sample booking + acknowledgement to verify SMTP
 ```
 
-Run `dev` and `dev:api` in two terminals during development. Without SMTP settings the API prints each email to its console instead of sending, so the whole flow works locally.
+Use `npm run dev:all` during development (or `dev` and `dev:api` in two terminals). If the form says **“Online booking is not connected yet”**, the page was served without the API: a static host, or `npm run dev` without `dev:api`. Without SMTP settings the API prints each email to its console instead of sending, so the whole flow works locally.
 
 ## Before launch — replace every placeholder
 
@@ -70,7 +71,7 @@ The server also verifies the SMTP connection at startup and logs loudly if it fa
 
 ### Deploying
 
-- **Single process** (Render, Railway, Fly, a VPS): `npm run build` then `npm start`; set `NODE_ENV=production` (most hosts do) and the `.env` variables in the host's environment settings. Set `TRUST_PROXY=true` behind a reverse proxy so rate limiting sees real client IPs.
+- **Single process** (Render, Railway, Fly, a VPS): `npm run build` then `npm start` — it serves `dist/` and `/api` together. Set `NODE_ENV=production` (most hosts do; it enforces the SMTP variables) and the `.env` variables in the host's environment settings. Static-only hosts (GitHub Pages, Netlify/Vercel static) cannot run the API — the form would show “Online booking is not connected yet”. Set `TRUST_PROXY=true` behind a reverse proxy so rate limiting sees real client IPs.
 - **Split** (static frontend on a CDN, API elsewhere): deploy `dist/` anywhere, run the server for `/api`, and set `ALLOWED_ORIGIN` to the site's origin. Point the frontend at the API by proxying `/api` at the CDN/edge (or change `APPOINTMENTS_ENDPOINT` in `src/lib/api.ts`).
 - Multiple API instances need a shared rate-limit store (swap `server/rateLimit.ts` for Redis).
 

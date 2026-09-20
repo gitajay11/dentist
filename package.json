@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "vite",
     "dev:api": "node --watch --env-file-if-exists=.env server/index.ts",
+    "dev:all": "node scripts/dev-all.mjs",
     "build": "tsc -b && vite build",
     "start": "node --env-file-if-exists=.env server/index.ts",
-    "lint": "oxlint",
     "preview": "vite preview",
+    "lint": "oxlint",
     "mail:test": "node --env-file-if-exists=.env server/mailTest.ts"
   },
   "dependencies": {
