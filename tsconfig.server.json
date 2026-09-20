@@ -20,5 +20,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["server", "src/lib/validation.ts"]
+  "include": ["server", "src/lib/validation.ts", "src/data/clinic.ts"]
 }

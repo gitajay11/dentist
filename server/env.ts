@@ -49,8 +49,9 @@ export const env = {
     from: optional('MAIL_FROM'),
     to: list('MAIL_TO'),
     sendPatientConfirmation: bool('SEND_PATIENT_CONFIRMATION', true),
-    clinicName: optional('CLINIC_NAME', 'Care Dental'),
-    clinicPhone: optional('CLINIC_PHONE', '[+91 00000 00000]'),
+    /** Optional overrides — defaults come from src/data/clinic.ts */
+    clinicName: optional('CLINIC_NAME'),
+    clinicPhone: optional('CLINIC_PHONE'),
   },
 
   rateLimit: {

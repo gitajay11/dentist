@@ -54,7 +54,7 @@ Two small on-page notes ("Figures shown are placeholders…", "Sample testimonia
 
 ### Email / SMTP
 
-Every submission sends two emails: a **booking request to the clinic** (`MAIL_TO`, Reply-To = the patient) and an **acknowledgement to the patient** (Reply-To = the clinic). Without SMTP settings the API prints both to its console instead of sending — that is the development fallback, not a bug.
+Every submission sends two designed HTML emails (with plain-text fallbacks): a **booking request to the clinic** (`MAIL_TO`, Reply-To = the patient; buttons to call, WhatsApp, email and add the slot to Google Calendar) and an **acknowledgement to the patient** (Reply-To = the clinic; what-happens-next steps, call / directions / calendar buttons). Clinic details in the emails come from `src/data/clinic.ts`; the logo is embedded inline from `public/logo-192.png`. Preview them without sending by using the JSON transport (leave `SMTP_HOST` empty). Without SMTP settings the API prints both to its console instead of sending — that is the development fallback, not a bug.
 
 Any SMTP provider works (Gmail app password, Brevo, Resend, SendGrid, Postmark, Zoho…). Set `SMTP_HOST/PORT/SECURE/USER/PASS`, `MAIL_FROM` (a sender your provider permits) and `MAIL_TO` in `.env` — see `.env.example`.
 
