@@ -95,9 +95,9 @@ export default function MenuOverlay({ open, onClose, openerRef }: MenuOverlayPro
         </button>
       </div>
 
-      <div className="grid flex-1 min-h-0 grid-cols-1 gap-6 overflow-y-auto px-3 pb-6 md:grid-cols-[1.2fr_1fr] md:gap-4 md:px-5">
-        {/* Links */}
-        <nav aria-label="Menu" className="flex flex-col justify-center md:px-2">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 overflow-y-auto px-3 pt-2 pb-6 md:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)] md:items-start md:gap-6 md:px-5 md:pt-4 lg:gap-10">
+        {/* Links — top-aligned with the contact card so both columns share a baseline */}
+        <nav aria-label="Menu" className="flex flex-col md:px-2 md:pt-7">
           <p className="label mb-3 text-neutral-400">Navigate</p>
           <ol className="border-t border-black/10">
             {navLinks.map((link, i) => (
@@ -128,7 +128,7 @@ export default function MenuOverlay({ open, onClose, openerRef }: MenuOverlayPro
 
         {/* Contact + booking */}
         <aside
-          className={`card-r fill-soft flex flex-col justify-between gap-8 p-5 md:p-7 ${item}`}
+          className={`card-r fill-soft flex flex-col gap-8 p-5 md:p-7 ${item}`}
           style={stagger(navLinks.length)}
         >
           <div className="grid grid-cols-2 gap-x-6 gap-y-5 md:grid-cols-1">

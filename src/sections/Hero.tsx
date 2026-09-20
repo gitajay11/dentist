@@ -38,7 +38,7 @@ export default function Hero({ ready }: HeroProps) {
       id="home"
       ref={setRefs}
       aria-label="Welcome"
-      className="section-shell relative min-h-svh overflow-hidden pt-[4.75rem] md:pt-24"
+      className="section-shell relative min-h-svh overflow-hidden pt-[4.75rem] md:pt-[5rem]"
     >
       {/* Accessible description of the shared photograph */}
       <span className="sr-only">{images.hero.alt}</span>
@@ -54,9 +54,9 @@ export default function Hero({ ready }: HeroProps) {
             cardsRef.current[i] = el
           }}
           style={getAnimStyle(i)}
-          className="card-r relative h-14 w-full shrink-0 overflow-hidden md:h-[4.5rem] lg:h-20"
+          className="card-r relative h-14 w-full shrink-0 overflow-hidden md:h-[clamp(3rem,7svh,5rem)]"
         >
-          <span className="relative z-10 flex h-full items-center justify-center text-center text-lg font-bold tracking-[-0.02em] text-black md:text-2xl lg:text-3xl">
+          <span className="relative z-10 flex h-full items-center justify-center text-center text-lg font-bold tracking-[-0.02em] text-black md:text-[clamp(1.25rem,3.2svh,1.875rem)]">
             {label}
           </span>
         </MaskedCard>
@@ -75,7 +75,7 @@ export default function Hero({ ready }: HeroProps) {
       >
         {/* Flex column: the top note and the bottom block can never overlap;
             the heading also scales with viewport height so short screens fit. */}
-        <div className="relative z-10 flex h-full min-h-[300px] flex-col justify-between p-4 md:p-6">
+        <div className="relative z-10 flex h-full min-h-[300px] flex-col justify-between p-4 md:min-h-[340px] md:p-6">
           <p className="max-w-[240px] text-[13px] leading-snug font-semibold text-black md:max-w-[320px] md:text-[15px]">
             We wish to provide professional dental services that match current technologies.
           </p>
@@ -86,7 +86,7 @@ export default function Hero({ ready }: HeroProps) {
                 <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-black" />
                 Trusted Dentists in {clinic.city}
               </span>
-              <h1 className="text-[clamp(3rem,min(11vw,15svh),11rem)] leading-[0.84] font-bold tracking-[-0.04em] text-black">
+              <h1 className="text-[clamp(3rem,min(11vw,14svh),11rem)] leading-[0.84] font-bold tracking-[-0.04em] text-black">
                 Dental
                 <br />
                 Care
