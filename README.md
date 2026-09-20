@@ -13,6 +13,7 @@ npm run dev:api        # appointment API on :8787, auto-restarts on change
 npm run build          # type-check (app + server) + production build → dist/
 npm start              # production: serves dist/ + /api from one process
 npm run lint           # oxlint
+npm run mail:test      # send a sample booking + acknowledgement to verify SMTP
 ```
 
 Run `dev` and `dev:api` in two terminals during development. Without SMTP settings the API prints each email to its console instead of sending, so the whole flow works locally.
@@ -52,7 +53,20 @@ Two small on-page notes ("Figures shown are placeholders…", "Sample testimonia
 
 ### Email / SMTP
 
-Any SMTP provider works (Gmail app password, Brevo, Resend, SendGrid, Postmark, Zoho…). Set `SMTP_HOST/PORT/SECURE/USER/PASS`, `MAIL_FROM` (a sender your provider permits) and `MAIL_TO` in `.env` — see `.env.example`. The server verifies the SMTP connection at startup and logs loudly if it fails. In production (`NODE_ENV=production`) it refuses to start without `SMTP_HOST`, `MAIL_FROM` and `MAIL_TO`, so a misconfigured deploy cannot silently drop requests.
+Every submission sends two emails: a **booking request to the clinic** (`MAIL_TO`, Reply-To = the patient) and an **acknowledgement to the patient** (Reply-To = the clinic). Without SMTP settings the API prints both to its console instead of sending — that is the development fallback, not a bug.
+
+Any SMTP provider works (Gmail app password, Brevo, Resend, SendGrid, Postmark, Zoho…). Set `SMTP_HOST/PORT/SECURE/USER/PASS`, `MAIL_FROM` (a sender your provider permits) and `MAIL_TO` in `.env` — see `.env.example`.
+
+**Gmail in three steps:** enable 2-Step Verification → create an *App password* (Google Account → Security → App passwords) → put it in `SMTP_PASS` with `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=465`, `SMTP_SECURE=true` and `SMTP_USER` / `MAIL_FROM` set to the Gmail address. Gmail can only send *as* that account. For a clinic domain address (e.g. reception@caredental.in) use that domain's mail provider or a transactional service such as Brevo or Resend.
+
+Then prove delivery without touching the website:
+
+```bash
+npm run mail:test                    # clinic copy → MAIL_TO, patient copy → MAIL_TO
+npm run mail:test -- you@example.com # patient copy → that address
+```
+
+The server also verifies the SMTP connection at startup and logs loudly if it fails. In production (`NODE_ENV=production`) it refuses to start without `SMTP_HOST`, `MAIL_FROM` and `MAIL_TO`, so a misconfigured deploy cannot silently drop requests.
 
 ### Deploying
 

@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "start": "node --env-file-if-exists=.env server/index.ts",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "mail:test": "node --env-file-if-exists=.env server/mailTest.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

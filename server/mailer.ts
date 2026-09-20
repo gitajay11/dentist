@@ -123,6 +123,8 @@ export async function sendPatientConfirmation(a: AppointmentRequest) {
   return getTransporter().sendMail({
     from: env.mail.from || `${env.mail.clinicName} <no-reply@localhost>`,
     to: `${a.fullName} <${a.email}>`,
+    // Patient replies go straight to the clinic inbox.
+    replyTo: env.mail.to[0],
     subject: `We received your appointment request · ${a.reference}`,
     text: `${intro}${text}\n\nIf anything changes, call us on ${env.mail.clinicPhone}.\n\n${env.mail.clinicName}`,
     html: wrap(
