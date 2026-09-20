@@ -1,4 +1,4 @@
-# Dental Health — Quality Healthcare
+# Care Dental — Healthy Smiles Brighter Lives
 
 Single-page dental clinic website with an appointment API. React 19 · Vite 8 · TypeScript · Tailwind CSS v4 · Express 5 · Nodemailer — no UI, icon or animation libraries (all motion is CSS). Requires Node ≥ 22.18 (the server runs TypeScript natively — no build step).
 
@@ -19,11 +19,11 @@ Run `dev` and `dev:api` in two terminals during development. Without SMTP settin
 
 ## Before launch — replace every placeholder
 
-“Dental Health / quality healthcare” is the reference template’s brand and all bracketed values (`[+91 00000 00000]`, …) are placeholders. Nothing has been invented; fill in verified clinic data only.
+All bracketed values (`[+91 00000 00000]`, …) are placeholders. Nothing has been invented; fill in verified clinic data only. The brand (Care Dental, logo in `logo/caredental.png`, resized icons in `public/`) is real.
 
 | What | Where |
 | --- | --- |
-| Clinic name + two-line wordmark, tagline, phone, email, address, opening hours, directions link, emergency / same-day flags, social links | `src/data/clinic.ts` |
+| Phone, email, address, opening hours, directions link, emergency / same-day flags, social links (name, wordmark, tagline and logo paths live here too) | `src/data/clinic.ts` |
 | Trust statistics (years, patients, specialties, rating) | `src/data/clinic.ts` → `stats` (or remove the block in `src/sections/About.tsx`) |
 | Photography (hero + gallery mosaics, implant section) | `src/data/clinic.ts` → `images` (reference-template assets, hot-linked). Mosaic images need a plain light background with the subject on the right; update the hero `<link rel="preload">` in `index.html` too |
 | Dentist names, qualifications, specialties, experience, bios, portraits | `src/data/doctors.ts` |

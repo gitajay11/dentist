@@ -1,16 +1,18 @@
 /**
  * Clinic identity & contact details.
  *
- * "Dental Health / Quality Healthcare" is the reference template's brand and
- * stands in until the real clinic name is supplied. Everything in square
- * brackets is a PLACEHOLDER — replace with verified information before
- * launch (also update the JSON-LD block in index.html).
+ * Everything in square brackets is a PLACEHOLDER — replace with verified
+ * information before launch (also update the JSON-LD block in index.html).
  */
 export const clinic = {
-  name: 'Dental Health',
+  name: 'Care Dental',
   /** Wordmark is stacked on two lines in the navbar / footer. */
-  wordmark: ['Dental', 'Health'],
-  tagline: 'quality healthcare',
+  wordmark: ['Care', 'Dental'],
+  /** Tagline as it appears on the logo badge. */
+  tagline: 'healthy smiles brighter lives',
+  /** Logo badge (public/): 192px for UI, 512px for sharing/app icons. */
+  logo: '/logo-192.png',
+  logoLarge: '/logo-512.png',
   city: 'Chennai',
 
   phone: '[+91 00000 00000]',
