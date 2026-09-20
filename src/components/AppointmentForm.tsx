@@ -29,6 +29,17 @@ const initialValues: AppointmentFormValues = {
 }
 
 // Slot hints are generic — align them with the clinic's real opening hours.
+const formatDate = (iso: string) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
+  if (!m) return iso
+  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).toLocaleDateString('en-IN', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
 const timeSlots = [
   { value: 'Morning', label: 'Morning', hint: 'until 12 pm' },
   { value: 'Afternoon', label: 'Afternoon', hint: '12 – 4 pm' },
@@ -102,7 +113,18 @@ export default function AppointmentForm() {
   const [appliedRequestId, setAppliedRequestId] = useState(0)
 
   const formRef = useRef<HTMLFormElement>(null)
+  const successRef = useRef<HTMLDivElement>(null)
   const abortRef = useRef<AbortController | null>(null)
+
+  // Bring the confirmation into view and announce it once it appears.
+  useEffect(() => {
+    if (status !== 'success') return
+    const el = successRef.current
+    if (!el) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' })
+    el.focus({ preventScroll: true })
+  }, [status])
 
   // A treatment card was clicked → pre-fill the select. Adjusting state
   // during render (rather than in an effect) avoids an extra render pass.
@@ -229,25 +251,53 @@ export default function AppointmentForm() {
   /* ---------------------------------------------------------------- */
 
   if (status === 'success') {
+    const summary = [
+      { label: 'Date', value: formatDate(values.preferredDate) },
+      { label: 'Time', value: values.preferredTime },
+      { label: 'Treatment', value: values.treatment },
+    ]
     return (
       <div
+        ref={successRef}
         role="status"
         aria-live="polite"
-        className="card-r flex h-full min-h-[26rem] flex-col items-start justify-between bg-black p-6 text-white md:p-8"
+        tabIndex={-1}
+        className="card-r flex min-h-[24rem] flex-1 flex-col justify-between gap-8 bg-black p-6 text-white outline-none md:p-8"
       >
-        <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white md:h-14 md:w-14" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 14 14" fill="none"><path d="M2 7.5l3.2 3L12 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        </span>
+        <div className="flex items-center justify-between gap-4">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white md:h-14 md:w-14" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7.5l3.2 3L12 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+          {reference && (
+            <span className="rounded-full border border-white/20 px-3 py-1.5 text-[11px] font-semibold tracking-[0.12em] text-white/70 uppercase">
+              Ref · {reference}
+            </span>
+          )}
+        </div>
+
+        <dl className="grid gap-2 lg:grid-cols-3 lg:gap-3">
+          {summary.map((s) => (
+            <div
+              key={s.label}
+              className="flex items-baseline justify-between gap-4 rounded-xl border border-white/15 px-4 py-3 lg:flex-col lg:gap-1.5 lg:p-4"
+            >
+              <dt className="label text-white/50">{s.label}</dt>
+              <dd className="text-right text-sm font-semibold lg:text-left">{s.value || '—'}</dd>
+            </div>
+          ))}
+        </dl>
+
         <div>
-        <h3 className="text-[clamp(2rem,4vw,3.5rem)] leading-[0.95] font-bold">Request received</h3>
-        <p className="mt-4 max-w-sm text-sm text-white/75 md:text-base">
-          Thank you, {values.fullName.split(' ')[0]}. Our team will contact you on {values.phone} to confirm your
-          appointment.
-          {reference ? ` Your reference is ${reference}.` : ''}
-        </p>
-        <button type="button" onClick={reset} className="pill pill-white pill-md mt-8">
-          Send another request
-        </button>
+          <h3 className="text-[clamp(2rem,4vw,3.25rem)] leading-[0.95] font-bold">Request received</h3>
+          <p className="mt-4 max-w-md text-sm text-white/75 md:text-base">
+            Thank you, {values.fullName.split(' ')[0]}. Our team will contact you on {values.phone} to confirm your
+            appointment — it is not confirmed until you hear from us.
+          </p>
+          <button type="button" onClick={reset} className="pill pill-white pill-md mt-6">
+            Send another request
+          </button>
         </div>
       </div>
     )
@@ -262,6 +312,11 @@ export default function AppointmentForm() {
       aria-describedby={`${uid}-form-note`}
       className="relative grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5"
     >
+      <div className="sm:col-span-2">
+        <h3 className="text-2xl leading-tight font-bold text-black md:text-3xl">Request an appointment</h3>
+        <p className="mt-1.5 mb-2 text-xs font-semibold text-neutral-500 md:mb-3 md:text-sm">Fields marked * are required.</p>
+      </div>
+
       <Field id={fieldId('fullName')} label="Full Name" error={touched.fullName ? errors.fullName : undefined}>
         {(a) => <input type="text" autoComplete="name" placeholder="Your name" {...inputProps('fullName', a)} />}
       </Field>

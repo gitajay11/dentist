@@ -72,9 +72,7 @@ export default function Contact() {
         </div>
 
         {/* Form */}
-        <div className="card-r fill-soft p-5 md:p-7" style={getAnimStyle(1)}>
-          <h3 className="text-2xl leading-tight font-bold text-black md:text-3xl">Request an appointment</h3>
-          <p className="mt-1.5 mb-6 text-xs font-semibold text-neutral-500 md:mb-8 md:text-sm">Fields marked * are required.</p>
+        <div className="card-r fill-soft flex flex-col p-5 md:p-7" style={getAnimStyle(1)}>
           <AppointmentForm />
         </div>
       </div>
