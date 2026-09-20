@@ -55,9 +55,9 @@ export async function verifyTransport(): Promise<void> {
 ------------------------------------------------------------------- */
 
 const brand = {
-  name: env.mail.clinicName || clinic.name,
+  name: clinic.name,
   tagline: clinic.tagline,
-  phone: env.mail.clinicPhone || clinic.phone,
+  phone: clinic.phone,
   phoneHref: clinic.phoneHref,
   email: env.mail.to[0] ?? clinic.email,
   address: `${clinic.address.line1}, ${clinic.address.line2}`,
