@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- SEO — replace bracketed placeholders with real clinic data before launch -->
+    <title>Dental Health - Quality Healthcare</title>
+    <meta
+      name="description"
+      content="Dental Health is a modern dental and implant clinic in Chennai — general, cosmetic, implant, orthodontic and paediatric dentistry with a gentle, patient-first approach."
+    />
+    <link rel="canonical" href="https://www.example.com/" />
+
+    <!-- Open Graph / social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Dental Health" />
+    <meta property="og:title" content="Dental Health - Quality Healthcare" />
+    <meta property="og:description" content="Professional dental services that match current technologies. Trusted dentists in Chennai." />
+    <meta property="og:url" content="https://www.example.com/" />
+    <meta property="og:image" content="https://www.example.com/og-image.jpg" />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Dental Health - Quality Healthcare" />
+    <meta name="twitter:description" content="Professional dental services that match current technologies. Trusted dentists in Chennai." />
+    <meta name="twitter:image" content="https://www.example.com/og-image.jpg" />
+
+    <!-- Hero mosaic image is a CSS background; preload it for LCP (keep in sync with src/data/clinic.ts) -->
+    <link
+      rel="preload"
+      as="image"
+      fetchpriority="high"
+      href="https://images.higgs.ai/?default=1&amp;output=webp&amp;url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260624_113640_ccf3cf97-d447-425b-a134-d7b09fc743fc.png&amp;w=1920&amp;q=85"
+    />
+
+    <!-- Fonts (reference template links) -->
+    <link rel="preconnect" href="https://db.onlinewebfonts.com" crossorigin />
+    <link href="https://db.onlinewebfonts.com/c/1cd1e7d71e048159076fd90b39846902?family=Open+Sauce+One" rel="stylesheet">
+    <link href="https://db.onlinewebfonts.com/c/42acf9aa4a6dc2f2886a3f682e337ead?family=Open+Sauce+One+Bold" rel="stylesheet">
+
+    <!--
+      Local business structured data (schema.org/Dentist).
+      Every bracketed value is a placeholder — fill in verified clinic details
+      (or remove fields you cannot verify) before going live.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Dentist",
+        "name": "Dental Health",
+        "url": "https://www.example.com/",
+        "image": "https://www.example.com/og-image.jpg",
+        "telephone": "[+91 00000 00000]",
+        "email": "[hello@clinic.example]",
+        "priceRange": "$$",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "[Street address]",
+          "addressLocality": "Chennai",
+          "addressRegion": "Tamil Nadu",
+          "postalCode": "[PIN code]",
+          "addressCountry": "IN"
+        },
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            "opens": "[09:00]",
+            "closes": "[20:00]"
+          }
+        ],
+        "medicalSpecialty": "Dentistry"
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
