@@ -66,6 +66,7 @@ function validateAll(values) {
 
 // server/env.ts
 var isProduction = process.env.NODE_ENV === "production";
+var isDeployed = isProduction || Boolean(process.env.VERCEL);
 function optional(name, fallback = "") {
   return (process.env[name] ?? fallback).trim();
 }
@@ -83,6 +84,7 @@ function list(name) {
 }
 var env = {
   isProduction,
+  isDeployed,
   port: int("PORT", 8787),
   /** Set when a reverse proxy (nginx, Render, Fly, …) sits in front of Node. */
   trustProxy: bool("TRUST_PROXY", false),
@@ -107,7 +109,7 @@ var env = {
 };
 var smtpConfigured = Boolean(env.smtp.host && env.mail.from && env.mail.to.length > 0);
 function missingProductionConfig() {
-  if (!env.isProduction) return [];
+  if (!env.isDeployed) return [];
   const missing = [];
   if (!env.smtp.host) missing.push("SMTP_HOST");
   if (!env.mail.from) missing.push("MAIL_FROM");
@@ -163,6 +165,10 @@ function getTransporter() {
       // true for 465, false for 587/STARTTLS
       auth: env.smtp.user ? { user: env.smtp.user, pass: env.smtp.pass } : void 0
     });
+  } else if (env.isDeployed) {
+    throw new Error(
+      "SMTP is not configured on this deployment. Set SMTP_HOST, MAIL_FROM and MAIL_TO in the host environment."
+    );
   } else {
     transporter = nodemailer.createTransport({ jsonTransport: true });
   }

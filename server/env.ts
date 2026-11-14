@@ -7,6 +7,15 @@
 
 const isProduction = process.env.NODE_ENV === 'production'
 
+/**
+ * True whenever this is a real deployment serving real patients.
+ *
+ * NODE_ENV alone is not enough: Vercel does not set it to "production" in the
+ * function runtime, which would let a deploy with no SMTP settings fall back to
+ * the console transport and answer "Request received" while emailing nobody.
+ */
+const isDeployed = isProduction || Boolean(process.env.VERCEL)
+
 function optional(name: string, fallback = ''): string {
   return (process.env[name] ?? fallback).trim()
 }
@@ -31,6 +40,7 @@ function list(name: string): string[] {
 
 export const env = {
   isProduction,
+  isDeployed,
   port: int('PORT', 8787),
   /** Set when a reverse proxy (nginx, Render, Fly, …) sits in front of Node. */
   trustProxy: bool('TRUST_PROXY', false),
@@ -65,7 +75,7 @@ export const smtpConfigured = Boolean(env.smtp.host && env.mail.from && env.mail
  * Empty in development, where the console transport stands in for SMTP.
  */
 export function missingProductionConfig(): string[] {
-  if (!env.isProduction) return []
+  if (!env.isDeployed) return []
   const missing: string[] = []
   if (!env.smtp.host) missing.push('SMTP_HOST')
   if (!env.mail.from) missing.push('MAIL_FROM')

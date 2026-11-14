@@ -31,6 +31,12 @@ export function getTransporter(): Transporter {
       secure: env.smtp.secure, // true for 465, false for 587/STARTTLS
       auth: env.smtp.user ? { user: env.smtp.user, pass: env.smtp.pass } : undefined,
     })
+  } else if (env.isDeployed) {
+    // Never let a real deployment "send" to the console: that answers the
+    // patient with a success they will never hear anything about.
+    throw new Error(
+      "SMTP is not configured on this deployment. Set SMTP_HOST, MAIL_FROM and MAIL_TO in the host environment.",
+    )
   } else {
     transporter = nodemailer.createTransport({ jsonTransport: true })
   }
