@@ -66,7 +66,7 @@ function validateAll(values) {
 
 // server/env.ts
 var isProduction = process.env.NODE_ENV === "production";
-var isDeployed = isProduction || Boolean(process.env.VERCEL);
+var consoleMailAllowed = optional("MAIL_TRANSPORT").toLowerCase() === "console";
 function optional(name, fallback = "") {
   return (process.env[name] ?? fallback).trim();
 }
@@ -84,7 +84,7 @@ function list(name) {
 }
 var env = {
   isProduction,
-  isDeployed,
+  consoleMailAllowed,
   port: int("PORT", 8787),
   /** Set when a reverse proxy (nginx, Render, Fly, …) sits in front of Node. */
   trustProxy: bool("TRUST_PROXY", false),
@@ -109,7 +109,7 @@ var env = {
 };
 var smtpConfigured = Boolean(env.smtp.host && env.mail.from && env.mail.to.length > 0);
 function missingProductionConfig() {
-  if (!env.isDeployed) return [];
+  if (env.consoleMailAllowed) return [];
   const missing = [];
   if (!env.smtp.host) missing.push("SMTP_HOST");
   if (!env.mail.from) missing.push("MAIL_FROM");
@@ -165,9 +165,9 @@ function getTransporter() {
       // true for 465, false for 587/STARTTLS
       auth: env.smtp.user ? { user: env.smtp.user, pass: env.smtp.pass } : void 0
     });
-  } else if (env.isDeployed) {
+  } else if (!env.consoleMailAllowed) {
     throw new Error(
-      "SMTP is not configured on this deployment. Set SMTP_HOST, MAIL_FROM and MAIL_TO in the host environment."
+      "SMTP is not configured. Set SMTP_HOST, MAIL_FROM and MAIL_TO, or MAIL_TRANSPORT=console to print emails instead of sending them."
     );
   } else {
     transporter = nodemailer.createTransport({ jsonTransport: true });
@@ -597,6 +597,8 @@ api.get("/health", (_req, res) => {
   res.json({
     ok: missing.length === 0,
     uptime: Math.round(process.uptime()),
+    // Booleans only — never the values themselves.
+    mail: { smtpConfigured, consoleTransport: env.consoleMailAllowed },
     ...missing.length > 0 ? { missingConfig: missing } : {}
   });
 });

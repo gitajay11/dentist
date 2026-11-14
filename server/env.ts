@@ -8,13 +8,16 @@
 const isProduction = process.env.NODE_ENV === 'production'
 
 /**
- * True whenever this is a real deployment serving real patients.
+ * Printing emails to the console instead of sending them must be opted into,
+ * never inferred.
  *
- * NODE_ENV alone is not enough: Vercel does not set it to "production" in the
- * function runtime, which would let a deploy with no SMTP settings fall back to
- * the console transport and answer "Request received" while emailing nobody.
+ * Inferring it from NODE_ENV or a platform flag is unsafe: Vercel exposes
+ * neither to the function runtime by default, so a deploy that forgot its SMTP
+ * settings would quietly "send" to the log and tell patients their request was
+ * received. Local development sets MAIL_TRANSPORT=console in .env; anything
+ * else refuses to accept a booking it cannot deliver.
  */
-const isDeployed = isProduction || Boolean(process.env.VERCEL)
+const consoleMailAllowed = optional('MAIL_TRANSPORT').toLowerCase() === 'console'
 
 function optional(name: string, fallback = ''): string {
   return (process.env[name] ?? fallback).trim()
@@ -40,7 +43,7 @@ function list(name: string): string[] {
 
 export const env = {
   isProduction,
-  isDeployed,
+  consoleMailAllowed,
   port: int('PORT', 8787),
   /** Set when a reverse proxy (nginx, Render, Fly, …) sits in front of Node. */
   trustProxy: bool('TRUST_PROXY', false),
@@ -67,15 +70,15 @@ export const env = {
   },
 }
 
-/** True when SMTP is fully configured. In dev we fall back to console output. */
+/** True when SMTP is fully configured; otherwise mail can only go to the console. */
 export const smtpConfigured = Boolean(env.smtp.host && env.mail.from && env.mail.to.length > 0)
 
 /**
  * Environment variables that must be set before the site can email anyone.
- * Empty in development, where the console transport stands in for SMTP.
+ * Empty only when MAIL_TRANSPORT=console has explicitly opted out of sending.
  */
 export function missingProductionConfig(): string[] {
-  if (!env.isDeployed) return []
+  if (env.consoleMailAllowed) return []
   const missing: string[] = []
   if (!env.smtp.host) missing.push('SMTP_HOST')
   if (!env.mail.from) missing.push('MAIL_FROM')

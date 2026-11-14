@@ -11,7 +11,7 @@ import { existsSync } from 'node:fs'
 import path from 'node:path'
 import express, { type NextFunction, type Request, type Response } from 'express'
 import { handleAppointment } from './appointments.ts'
-import { env, missingProductionConfig } from './env.ts'
+import { env, missingProductionConfig, smtpConfigured } from './env.ts'
 import { createRateLimiter } from './rateLimit.ts'
 
 /** True on Vercel, where the CDN serves the site and the function only answers /api. */
@@ -51,6 +51,8 @@ api.get('/health', (_req, res) => {
   res.json({
     ok: missing.length === 0,
     uptime: Math.round(process.uptime()),
+    // Booleans only — never the values themselves.
+    mail: { smtpConfigured, consoleTransport: env.consoleMailAllowed },
     ...(missing.length > 0 ? { missingConfig: missing } : {}),
   })
 })
