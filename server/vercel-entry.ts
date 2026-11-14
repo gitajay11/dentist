@@ -10,7 +10,7 @@
  * Without them /api/appointments answers 503 and names what is missing.
  */
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { app } from '../server/app.ts'
+import { app } from './app.ts'
 
 export default function handler(req: IncomingMessage, res: ServerResponse) {
   // The router is mounted at /api. Vercel normally forwards the original URL,
