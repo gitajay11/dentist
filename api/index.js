@@ -476,7 +476,7 @@ function parseBody(body) {
       values[key] = "";
       continue;
     }
-    const clean = raw.replace(/[ --]/g, "").trim();
+    const clean = raw.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim();
     if (clean.length > MAX_LENGTH[key]) errors[key] = `Must be ${MAX_LENGTH[key]} characters or fewer.`;
     values[key] = clean;
   }
@@ -508,19 +508,23 @@ async function handleAppointment(req, res) {
     receivedAt: /* @__PURE__ */ new Date(),
     ip: req.ip ?? "unknown"
   };
-  try {
-    const clinicMail = await sendClinicNotification(appointment);
-    logMail("clinic notification", clinicMail);
-  } catch (err) {
-    console.error(`[appointments] ${appointment.reference} clinic notification failed:`, err);
+  const [clinicResult, patientResult] = await Promise.allSettled([
+    sendClinicNotification(appointment),
+    env.mail.sendPatientConfirmation ? sendPatientConfirmation(appointment) : Promise.resolve(null)
+  ]);
+  if (clinicResult.status === "rejected") {
+    console.error(`[appointments] ${appointment.reference} clinic notification failed:`, clinicResult.reason);
     res.status(502).json({
       ok: false,
       message: "We could not deliver your request right now. Please call the clinic to book."
     });
     return;
   }
-  if (env.mail.sendPatientConfirmation) {
-    sendPatientConfirmation(appointment).then((info) => logMail("patient confirmation", info)).catch((err) => console.error(`[appointments] ${appointment.reference} patient confirmation failed:`, err));
+  logMail("clinic notification", clinicResult.value);
+  if (patientResult.status === "rejected") {
+    console.error(`[appointments] ${appointment.reference} patient confirmation failed:`, patientResult.reason);
+  } else if (patientResult.value) {
+    logMail("patient confirmation", patientResult.value);
   }
   console.log(`[appointments] ${appointment.reference} received from ${appointment.ip} (${appointment.treatment})`);
   res.status(200).json({ ok: true, reference: appointment.reference });
@@ -598,7 +602,11 @@ api.get("/health", (_req, res) => {
     ok: missing.length === 0,
     uptime: Math.round(process.uptime()),
     // Booleans only — never the values themselves.
-    mail: { smtpConfigured, consoleTransport: env.consoleMailAllowed },
+    mail: {
+      smtpConfigured,
+      consoleTransport: env.consoleMailAllowed,
+      patientConfirmation: env.mail.sendPatientConfirmation
+    },
     ...missing.length > 0 ? { missingConfig: missing } : {}
   });
 });

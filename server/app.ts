@@ -52,7 +52,11 @@ api.get('/health', (_req, res) => {
     ok: missing.length === 0,
     uptime: Math.round(process.uptime()),
     // Booleans only — never the values themselves.
-    mail: { smtpConfigured, consoleTransport: env.consoleMailAllowed },
+    mail: {
+      smtpConfigured,
+      consoleTransport: env.consoleMailAllowed,
+      patientConfirmation: env.mail.sendPatientConfirmation,
+    },
     ...(missing.length > 0 ? { missingConfig: missing } : {}),
   })
 })
