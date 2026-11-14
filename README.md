@@ -71,6 +71,22 @@ The server also verifies the SMTP connection at startup and logs loudly if it fa
 
 ### Deploying
 
+**Vercel (current production).** `vercel.json` rewrites `/api/*` to `api/index.ts`, which serves the same Express app as the local server; the CDN serves `dist/`. Set these in **Project Settings → Environment Variables** (Production + Preview), then redeploy:
+
+| Variable | Value |
+|---|---|
+| `SMTP_HOST` | `smtp.gmail.com` |
+| `SMTP_PORT` | `465` |
+| `SMTP_SECURE` | `true` |
+| `SMTP_USER` | the Gmail address |
+| `SMTP_PASS` | the Google App Password |
+| `MAIL_FROM` | e.g. `Care Dental <you@gmail.com>` |
+| `MAIL_TO` | the clinic inbox |
+
+`.env` is git-ignored and never reaches Vercel — these are a separate copy. Until they are set, `POST /api/appointments` answers **503** naming the missing variables, and `GET /api/health` reports `{"ok":false,"missingConfig":[...]}` — use it as a post-deploy check.
+
+Two notes for a commercial deploy: the in-memory rate limiter in `server/rateLimit.ts` is per-instance on serverless, so it throttles bursts rather than enforcing a global limit (the honeypot and server-side validation are unaffected) — move it to Upstash Redis when traffic justifies it. And Gmail only sends *as* the signed-in account; use Resend/Brevo on the clinic domain for patient-facing mail.
+
 - **Single process** (Render, Railway, Fly, a VPS): `npm run build` then `npm start` — it serves `dist/` and `/api` together. Set `NODE_ENV=production` (most hosts do; it enforces the SMTP variables) and the `.env` variables in the host's environment settings. Static-only hosts (GitHub Pages, Netlify/Vercel static) cannot run the API — the form would show “Online booking is not connected yet”. Set `TRUST_PROXY=true` behind a reverse proxy so rate limiting sees real client IPs.
 - **Split** (static frontend on a CDN, API elsewhere): deploy `dist/` anywhere, run the server for `/api`, and set `ALLOWED_ORIGIN` to the site's origin. Point the frontend at the API by proxying `/api` at the CDN/edge (or change `APPOINTMENTS_ENDPOINT` in `src/lib/api.ts`).
 - Multiple API instances need a shared rate-limit store (swap `server/rateLimit.ts` for Redis).

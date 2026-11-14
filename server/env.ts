@@ -60,13 +60,26 @@ export const env = {
 /** True when SMTP is fully configured. In dev we fall back to console output. */
 export const smtpConfigured = Boolean(env.smtp.host && env.mail.from && env.mail.to.length > 0)
 
-/** Fail fast in production rather than silently dropping appointment requests. */
-export function assertProductionConfig(): void {
-  if (!env.isProduction) return
+/**
+ * Environment variables that must be set before the site can email anyone.
+ * Empty in development, where the console transport stands in for SMTP.
+ */
+export function missingProductionConfig(): string[] {
+  if (!env.isProduction) return []
   const missing: string[] = []
   if (!env.smtp.host) missing.push('SMTP_HOST')
   if (!env.mail.from) missing.push('MAIL_FROM')
   if (env.mail.to.length === 0) missing.push('MAIL_TO')
+  return missing
+}
+
+/**
+ * Fail fast in production rather than silently dropping appointment requests.
+ * Used by the long-running server; serverless answers with a 503 instead so the
+ * cause is visible in the response rather than only in the function logs.
+ */
+export function assertProductionConfig(): void {
+  const missing = missingProductionConfig()
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables in production: ${missing.join(', ')}`)
   }
